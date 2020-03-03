@@ -1,6 +1,9 @@
 import tkinter as tk
 
 
-def start():
-    root = tk.Tk()
-    root.mainloop()
+class MainWindow():
+    def __init__(self):
+        self.root = tk.Tk()
+
+    def start(self):
+        self.root.mainloop()

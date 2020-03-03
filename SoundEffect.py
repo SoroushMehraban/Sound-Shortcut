@@ -9,14 +9,16 @@ class LoggerThread(threading.Thread):
         super().__init__()
 
     def run(self):
-        Logger.start()
+        logger = Logger.Keylogger()
+        logger.start()
 
 
 def main():
-    loggerThread = LoggerThread()
-    loggerThread.start()
+    logger_thread = LoggerThread()
+    logger_thread.start()
 
-    GUI.start()
+    main_window = GUI.MainWindow()
+    main_window.start()
 
 
 if __name__ == '__main__':
