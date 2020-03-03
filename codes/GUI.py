@@ -5,6 +5,7 @@ from tkinter import ttk, filedialog
 class MainWindow:
     def __init__(self, subject):
         self.subject = subject
+        self.shortcut_keys = []
 
         self.initialize_root()
         self.initialize_file_manager()
@@ -12,7 +13,12 @@ class MainWindow:
 
     def initialize_shortcut_label(self):
         self.labelStringVar = tk.StringVar()
-        self.shortcut_label = tk.Label(self.root, textvariable=self.labelStringVar)
+        self.labelStringVar.set("Shortcut:   ")
+        self.shortcut_label = tk.Label(self.root, textvariable=self.labelStringVar,
+                                       fg="light green",
+                                       bg="dark green",
+                                       font="Helvetica 16 bold italic"
+                                       )
         self.shortcut_label.grid(column=2, row=1, padx=20, pady=20)
 
     def initialize_file_manager(self):
@@ -38,9 +44,21 @@ class MainWindow:
         self.root.mainloop()
 
     def update(self):
-        current = self.labelStringVar.get()
-        if len(current) == 0:
-            self.labelStringVar.set(self.subject.get_last_key())
+        last_key = self.subject.get_last_key()
+
+        if last_key == 'enter':
+            self.shortcut_keys = []
+        elif last_key == 'backspace':
+            self.shortcut_keys.pop()
         else:
-            self.labelStringVar.set(current + " + " + self.subject.get_last_key())
+            self.shortcut_keys.append(last_key)
+
+        if len(self.shortcut_keys) != 0:
+            current = self.shortcut_keys[0]
+            for key in self.shortcut_keys[1:]:
+                current += '+' + key
+        else:
+            current = ''
+
+        self.labelStringVar.set("Shortcut:   " + current)
         self.root.update_idletasks()
