@@ -7,19 +7,20 @@ input_buffer = ''  # a buffer to store inserted keys ( Resets each 5 sec )
 
 # this class run a thread to clear input buffer each 5 sec:
 class _BufferThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, logger):
         super().__init__()
+        self.logger = logger
 
     def run(self):
-        logger = Keylogger()
         while True:
             time.sleep(5)  # wait for 5 sec
-            logger.reset_buffer()
+            self.logger.reset_buffer()
 
 
-class Keylogger():
-    def __init__(self):
+class Keylogger:
+    def __init__(self, subject=None):
         self.input_buffer = ''
+        self.subject = subject
 
     # this function resets buffer whenever it is called
     def reset_buffer(self):
@@ -32,11 +33,11 @@ class Keylogger():
             self.input_buffer += str(key)[1:-1]
         else:
             self.input_buffer += str(key)
-        print(self.input_buffer)
+        self.subject.set_buffer(self.input_buffer)
 
     # our main function that starts when we run our code
     def start(self):
-        buffer_thread = _BufferThread()  # creating object of our thread
+        buffer_thread = _BufferThread(self)  # creating object of our thread
         buffer_thread.start()  # start our thread
         with Listener(
                 on_press=self.on_press) as listener:  # listener to listen key pressing and calling on_press function
