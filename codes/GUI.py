@@ -6,7 +6,6 @@ class MainWindow:
     def __init__(self, subject):
         self.subject = subject
 
-
         self.initialize_root()
         self.initialize_file_manager()
         self.initialize_shortcut_label()
@@ -39,5 +38,9 @@ class MainWindow:
         self.root.mainloop()
 
     def update(self):
-        self.labelStringVar.set(self.subject.get_buffer())
+        current = self.labelStringVar.get()
+        if len(current) == 0:
+            self.labelStringVar.set(self.subject.get_last_key())
+        else:
+            self.labelStringVar.set(current + " + " + self.subject.get_last_key())
         self.root.update_idletasks()
