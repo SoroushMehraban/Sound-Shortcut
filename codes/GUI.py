@@ -14,8 +14,17 @@ class MainWindow:
         self.user_selects_a_file = 0
 
         self.initialize_root()
+        self.initialize_scrollbar()
         self.initialize_file_manager()
         self.initialize_shortcut_label()
+
+    def initialize_scrollbar(self):
+        self.scroll_title = tk.Label(self.root, text="List of shortcuts:")
+        self.scroll_title.grid(column=1, row=3)
+
+        self.sb = tk.Scrollbar(self.root)
+        self.mylist = tk.Listbox(self.root, width=100, yscrollcommand=self.sb.set)
+        self.mylist.grid(column=1, row=4, padx=20)
 
     def initialize_shortcut_label(self):
         self.labelStringVar = tk.StringVar()
@@ -25,11 +34,10 @@ class MainWindow:
                                        bg="dark green",
                                        font="Helvetica 16 bold italic"
                                        )
-        self.shortcut_label.grid(column=2, row=1, padx=20, pady=20)
 
     def initialize_file_manager(self):
         self.label_frame = ttk.LabelFrame(self.root, text="Open a sound file!")
-        self.label_frame.grid(column=1, row=1, padx=20, pady=20)
+        self.label_frame.grid(column=1, row=1, pady=20)
         self.initialize_button()
 
     def initialize_button(self):
@@ -37,10 +45,11 @@ class MainWindow:
         self.file_button.grid(column=1, row=1)
 
     def file_dialog(self):
-        self.file_dir = filedialog.askopenfilename(initialdir="/", title="Select A File", filetype=
+        self.file_dir = filedialog.askopenfilename(initialdir="", title="Select A File", filetype=
         (("mp3 files", "*.mp3"), ("all files", "*.*")))
 
         if self.file_dir != '':  # if a file is selected
+            self.shortcut_label.grid(column=1, row=2)
             self.user_selects_a_file = 1
 
     def initialize_root(self):
@@ -64,11 +73,20 @@ class MainWindow:
         shortcut = self.shortcut_keys[0] + self.shortcut_keys[1]
         self.sound_dict[shortcut] = self.file_dir
 
+    def __add_shortcut_to_scroll_list(self):
+        shortcut = self.shortcut_keys[0] + self.shortcut_keys[1]
+
+        list_element = shortcut + ": " + self.file_dir.split('/')[-1]
+        self.mylist.insert(tk.END, list_element)
+
     def __add_or_remove_shortcut(self, last_key):
         if last_key == 'enter':  # if user press enter key
             if len(self.shortcut_keys) == 2:  # and already pressed 2 keys before,save shortcut else do nothing
                 self.__add_shortcut_to_dict()
+                self.__add_shortcut_to_scroll_list()
+
                 self.shortcut_keys.clear()
+                self.shortcut_label.grid_forget()
                 self.user_selects_a_file = 0
 
         elif last_key == 'backspace':  # if user press backspace key
