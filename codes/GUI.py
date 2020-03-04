@@ -142,4 +142,7 @@ class MainWindow:
             self.labelStringVar.set("Shortcut:   " + current)
             self.root.update_idletasks()
         else:
-            self.__add_inserted_shortcut(last_key)
+            if last_key == 'esc':  # if user press escape button ---> it stops playing sound
+                mixer.music.stop()
+            else:
+                self.__add_inserted_shortcut(last_key)
