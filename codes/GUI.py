@@ -1,3 +1,4 @@
+import json
 import tkinter as tk
 from tkinter import ttk, filedialog
 from pygame import mixer
@@ -14,6 +15,7 @@ class MainWindow:
         self.user_selects_a_file = 0
 
         self.initialize_root()
+        self.load_saved_sounds()
         self.initialize_scrollbar()
         self.initialize_file_manager()
         self.initialize_shortcut_label()
@@ -25,6 +27,15 @@ class MainWindow:
         self.sb = tk.Scrollbar(self.root)
         self.mylist = tk.Listbox(self.root, width=100, yscrollcommand=self.sb.set)
         self.mylist.grid(column=1, row=4, padx=20)
+        for key in self.sound_dict:
+            self.__add_shortcut_to_scroll_list(key, self.sound_dict[key].split('/')[-1])
+
+    def load_saved_sounds(self):
+        try:
+            with open('data.txt') as json_file:
+                self.sound_dict = json.load(json_file)
+        except IOError:
+            pass
 
     def initialize_shortcut_label(self):
         self.labelStringVar = tk.StringVar()
@@ -69,21 +80,25 @@ class MainWindow:
             current = ''
         return current
 
-    def __add_shortcut_to_dict(self):
-        shortcut = self.shortcut_keys[0] + self.shortcut_keys[1]
+    def __add_shortcut_to_dict(self, shortcut):
         self.sound_dict[shortcut] = self.file_dir
 
-    def __add_shortcut_to_scroll_list(self):
-        shortcut = self.shortcut_keys[0] + self.shortcut_keys[1]
+    def __add_shortcut_to_scroll_list(self, shortcut, file):
 
-        list_element = shortcut + ": " + self.file_dir.split('/')[-1]
+        list_element = shortcut + ": " + file
         self.mylist.insert(tk.END, list_element)
+
+    def __save_dict(self):
+        with open('data.txt', 'w') as outfile:
+            json.dump(self.sound_dict, outfile)
 
     def __add_or_remove_shortcut(self, last_key):
         if last_key == 'enter':  # if user press enter key
             if len(self.shortcut_keys) == 2:  # and already pressed 2 keys before,save shortcut else do nothing
-                self.__add_shortcut_to_dict()
-                self.__add_shortcut_to_scroll_list()
+                shortcut = self.shortcut_keys[0] + self.shortcut_keys[1]
+                self.__add_shortcut_to_dict(shortcut)
+                self.__add_shortcut_to_scroll_list(shortcut, self.file_dir.split('/')[-1])
+                self.__save_dict()
 
                 self.shortcut_keys.clear()
                 self.shortcut_label.grid_forget()
