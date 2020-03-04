@@ -6,7 +6,9 @@ class MainWindow:
     def __init__(self, subject):
         self.subject = subject
         self.shortcut_keys = []
-        self.file_selected_flag = 0
+        self.inserted_keys = []
+        self.sound_dict = {}
+        self.user_selects_a_file = 0
 
         self.initialize_root()
         self.initialize_file_manager()
@@ -32,10 +34,11 @@ class MainWindow:
         self.file_button.grid(column=1, row=1)
 
     def file_dialog(self):
-        file_name = filedialog.askopenfilename(initialdir="/", title="Select A File", filetype=
+        self.file_dir = filedialog.askopenfilename(initialdir="/", title="Select A File", filetype=
         (("mp3 files", "*.mp3"), ("all files", "*.*")))
-        self.file_selected_flag = 1
-        print(file_name)
+        if self.file_dir != '':
+            self.user_selects_a_file = 1
+        print(self.file_dir)
 
     def initialize_root(self):
         self.root = tk.Tk()
@@ -54,11 +57,16 @@ class MainWindow:
             current = ''
         return current
 
+    def __add_shortcut_to_dict(self):
+        shortcut = self.shortcut_keys[0] + self.shortcut_keys[1]
+        self.sound_dict[shortcut] = self.file_dir
+
     def __add_or_remove_shortcut(self, last_key):
         if last_key == 'enter':  # if user press enter key
             if len(self.shortcut_keys) == 2:  # and already pressed 2 keys before,save shortcut else do nothing
-                self.shortcut_keys = []
-                self.file_selected_flag = 0
+                self.__add_shortcut_to_dict()
+                self.shortcut_keys.clear()
+                self.user_selects_a_file = 0
 
         elif last_key == 'backspace':  # if user press backspace key
             if len(
@@ -68,13 +76,27 @@ class MainWindow:
         elif len(self.shortcut_keys) < 2:  # add only 2 keys in shortcut
             self.shortcut_keys.append(last_key)
 
-    def update(self):
-        print(self.file_selected_flag)
-        if self.file_selected_flag:
-            last_key = self.subject.get_last_key()  # get last key pressed by user
+    def __find_shortcut(self):
+        shortcut = self.inserted_keys[0] + self.inserted_keys[1]
+        if self.sound_dict.__contains__(shortcut):
+            print(self.sound_dict[shortcut])
 
+    def __add_inserted_shortcut(self, last_key):
+        if len(self.inserted_keys) == 0:
+            self.inserted_keys.append(last_key)
+        elif len(self.inserted_keys) == 1:
+            self.inserted_keys.append(last_key)
+
+            self.__find_shortcut()
+            self.inserted_keys.clear()  # make list empty
+
+    def update(self):
+        last_key = self.subject.get_last_key()  # get last key pressed by user
+        if self.user_selects_a_file:
             self.__add_or_remove_shortcut(last_key)
             current = self.__prepare_print_shortcut()
 
             self.labelStringVar.set("Shortcut:   " + current)
             self.root.update_idletasks()
+        else:
+            self.__add_inserted_shortcut(last_key)
