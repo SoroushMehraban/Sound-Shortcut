@@ -19,6 +19,11 @@ class MainWindow:
         self.initialize_scrollbar()
         self.initialize_file_manager()
         self.initialize_shortcut_label()
+        self.initialize_checkbox()
+
+    def initialize_checkbox(self):
+        self.activate_var = tk.IntVar()
+        self.checkbox = tk.Checkbutton(self.root, text="Activate", variable=self.activate_var).grid(column=1, row=5)
 
     def initialize_scrollbar(self):
         self.scroll_title = tk.Label(self.root, text="List of shortcuts:")
@@ -135,14 +140,19 @@ class MainWindow:
 
     def update(self):
         last_key = self.subject.get_last_key()  # get last key pressed by user
-        if self.user_selects_a_file:
-            self.__add_or_remove_shortcut(last_key)
-            current = self.__prepare_print_shortcut()
-
-            self.labelStringVar.set("Shortcut:   " + current)
-            self.root.update_idletasks()
+        if last_key == 'f2':  # deactivate listening
+            self.activate_var.set(0)
+        elif last_key == 'f3': # activate listening
+            self.activate_var.set(1)
         else:
-            if last_key == 'esc':  # if user press escape button ---> it stops playing sound
-                mixer.music.stop()
+            if self.user_selects_a_file:
+                self.__add_or_remove_shortcut(last_key)
+                current = self.__prepare_print_shortcut()
+
+                self.labelStringVar.set("Shortcut:   " + current)
+                self.root.update_idletasks()
             else:
-                self.__add_inserted_shortcut(last_key)
+                if last_key == 'esc':  # if user press escape button ---> it stops playing sound
+                    mixer.music.stop()
+                elif self.activate_var.get() == 1:  # if listening is active
+                    self.__add_inserted_shortcut(last_key)
