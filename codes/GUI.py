@@ -84,7 +84,6 @@ class MainWindow:
         self.sound_dict[shortcut] = self.file_dir
 
     def __add_shortcut_to_scroll_list(self, shortcut, file):
-
         list_element = shortcut + ": " + file
         self.mylist.insert(tk.END, list_element)
 
@@ -113,7 +112,7 @@ class MainWindow:
             self.shortcut_keys.append(last_key)
 
     def __find_shortcut(self):
-        shortcut = self.inserted_keys[0] + self.inserted_keys[1]
+        shortcut = self.inserted_keys[-2] + self.inserted_keys[-1]
         if self.sound_dict.__contains__(shortcut):
             return self.sound_dict[shortcut]
         else:
@@ -124,14 +123,15 @@ class MainWindow:
         if sound_dir is not None:
             mixer.music.load(sound_dir)
             mixer.music.play()
+            return True
+        return False
 
     def __add_inserted_shortcut(self, last_key):
-        if len(self.inserted_keys) == 0:
-            self.inserted_keys.append(last_key)
-        elif len(self.inserted_keys) == 1:
-            self.inserted_keys.append(last_key)
-            self.__play_sound_if_exists()
-            self.inserted_keys.clear()  # make list empty
+        self.inserted_keys.append(last_key)
+        if len(self.inserted_keys) >= 2:
+            played = self.__play_sound_if_exists()
+            if played:
+                self.inserted_keys.clear()  # make list empty
 
     def update(self):
         last_key = self.subject.get_last_key()  # get last key pressed by user
