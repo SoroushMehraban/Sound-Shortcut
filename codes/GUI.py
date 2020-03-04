@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
+from pygame import mixer
+
+mixer.init()
 
 
 class MainWindow:
@@ -36,9 +39,9 @@ class MainWindow:
     def file_dialog(self):
         self.file_dir = filedialog.askopenfilename(initialdir="/", title="Select A File", filetype=
         (("mp3 files", "*.mp3"), ("all files", "*.*")))
-        if self.file_dir != '':
+
+        if self.file_dir != '':  # if a file is selected
             self.user_selects_a_file = 1
-        print(self.file_dir)
 
     def initialize_root(self):
         self.root = tk.Tk()
@@ -79,15 +82,22 @@ class MainWindow:
     def __find_shortcut(self):
         shortcut = self.inserted_keys[0] + self.inserted_keys[1]
         if self.sound_dict.__contains__(shortcut):
-            print(self.sound_dict[shortcut])
+            return self.sound_dict[shortcut]
+        else:
+            return None
+
+    def __play_sound_if_exists(self):
+        sound_dir = self.__find_shortcut()
+        if sound_dir is not None:
+            mixer.music.load(sound_dir)
+            mixer.music.play()
 
     def __add_inserted_shortcut(self, last_key):
         if len(self.inserted_keys) == 0:
             self.inserted_keys.append(last_key)
         elif len(self.inserted_keys) == 1:
             self.inserted_keys.append(last_key)
-
-            self.__find_shortcut()
+            self.__play_sound_if_exists()
             self.inserted_keys.clear()  # make list empty
 
     def update(self):
